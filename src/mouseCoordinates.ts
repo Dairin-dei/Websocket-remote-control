@@ -1,5 +1,7 @@
 import robot from 'robotjs';
 export function getMousePosition() {
   const currentMousePosition = robot.getMousePos();
-  return { x: currentMousePosition.x, y: currentMousePosition.y };
+  return `mouse_position ${String(currentMousePosition.x)},${String(
+    currentMousePosition.y
+  )}\0`;
 }

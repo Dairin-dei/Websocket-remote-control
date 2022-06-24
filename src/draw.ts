@@ -13,7 +13,6 @@ export function executeDraw(cmd: string, arrData: Array<string | number>) {
   }
   switch (cmd) {
     case 'draw_circle':
-      //добавить проверку на выход за пределы экрана
       robot.moveMouse(
         currentMousePosition.x + dataClient,
         currentMousePosition.y
@@ -30,7 +29,6 @@ export function executeDraw(cmd: string, arrData: Array<string | number>) {
       );
       break;
     case 'draw_square':
-      //добавить проверку на выход за пределы экрана
       robot.mouseToggle('down');
       for (
         let x = currentMousePosition.x;
@@ -66,7 +64,6 @@ export function executeDraw(cmd: string, arrData: Array<string | number>) {
       );
       break;
     case 'draw_rectangle':
-      //добавить проверку на выход за пределы экрана
       robot.mouseToggle('down');
       for (
         let x = currentMousePosition.x;

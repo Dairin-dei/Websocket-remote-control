@@ -17,8 +17,10 @@ export async function getPrintScreen() {
   });
 
   const buffer = await jimpData.getBase64Async(Jimp.MIME_PNG);
-  console.log(
-    `Result: sent printscreen from {x: ${currentMousePosition.x} px},{x: ${currentMousePosition.y} px}, width: 200 px, height: 200 px`
-  );
-  return buffer.slice(buffer.indexOf(',') + 1);
+
+  return {
+    message: `prnt_scrn ${buffer.slice(buffer.indexOf(',') + 1)}\0`,
+    x: currentMousePosition.x,
+    y: currentMousePosition.y,
+  };
 }

@@ -1,7 +1,7 @@
-import Jimp from 'jimp';
-import { httpServer } from './src/http_server/index.js';
+import { httpServer } from './src/http_server/index';
 import robot from 'robotjs';
 import { WebSocketServer } from 'ws';
+import { getPrintScreen } from './src/getPrintScreen';
 
 const HTTP_PORT = 3000;
 
@@ -15,15 +15,15 @@ const screenWidth = robot.getScreenSize().width;
 
 wsServer.on('connection', (ws) => {
   console.log('Start Web socket server on the 8080 port!');
-  ws.on('message', (data) => {
+  ws.on('message', async (data) => {
     console.log('received: %s', data);
     const dataConverted = ` ${data}`.trim();
 
     const arrData = dataConverted.split(' ');
-    let cmd = arrData[0];
-    let dataClient;
-    let width;
-    let height;
+    let cmd: string = arrData[0];
+    let dataClient: number = 0;
+    let width: number = 0;
+    let height: number = 0;
     if (arrData.length > 2) {
       width = Number(arrData[1]);
       height = Number(arrData[2]);
@@ -31,18 +31,26 @@ wsServer.on('connection', (ws) => {
       dataClient = Number(arrData[1]);
     }
 
-    console.log('splitted', cmd, dataClient);
-    const currentMousePosition = robot.getMousePos();
+    let currentMousePosition = robot.getMousePos();
+    let cmdType: string = '';
+    if (cmd.indexOf('mouse_') > 0) {
+      cmdType = 'navigate';
+    } else if (cmd.indexOf('draw_') > 0) {
+      cmdType = 'draw';
+    } else {
+      cmdType = 'screen';
+    }
 
-    console.log(
-      `${cmd} {${currentMousePosition.x} px},{${currentMousePosition.y} px}`
-    );
-
-    switch (cmd) {
+    switch (cmdType) {
       case 'mouse_up':
         robot.moveMouse(
           currentMousePosition.x,
           Math.max(0, currentMousePosition.y - dataClient)
+        );
+
+        currentMousePosition = robot.getMousePos();
+        console.log(
+          `Result: mouse up to {${currentMousePosition.x} px},{${currentMousePosition.y} px}`
         );
         break;
       case 'mouse_down':
@@ -50,11 +58,19 @@ wsServer.on('connection', (ws) => {
           currentMousePosition.x,
           Math.min(screenHeight, currentMousePosition.y + dataClient)
         );
+        currentMousePosition = robot.getMousePos();
+        console.log(
+          `Result: mouse down to {${currentMousePosition.x} px},{${currentMousePosition.y} px}`
+        );
         break;
       case 'mouse_right':
         robot.moveMouse(
           Math.min(screenWidth, currentMousePosition.x + dataClient),
           currentMousePosition.y
+        );
+        currentMousePosition = robot.getMousePos();
+        console.log(
+          `Result: mouse right to {${currentMousePosition.x} px},{${currentMousePosition.y} px}`
         );
         break;
       case 'mouse_left':
@@ -62,12 +78,20 @@ wsServer.on('connection', (ws) => {
           Math.max(0, currentMousePosition.x) - dataClient,
           currentMousePosition.y
         );
+        currentMousePosition = robot.getMousePos();
+        console.log(
+          `Result: mouse left to {${currentMousePosition.x} px},{${currentMousePosition.y} px}`
+        );
         break;
       case 'mouse_position':
         ws.send(
           `${cmd} ${String(currentMousePosition.x)},${String(
             currentMousePosition.y
-          )}`
+          )}\0`
+        );
+        currentMousePosition = robot.getMousePos();
+        console.log(
+          `Result: mouse-position is {${currentMousePosition.x} px},{${currentMousePosition.y} px}`
         );
         break;
       case 'draw_circle':
@@ -83,6 +107,9 @@ wsServer.on('connection', (ws) => {
           robot.dragMouse(x, y);
         }
         robot.mouseToggle('up');
+        console.log(
+          `Result: circle at {x: ${currentMousePosition.x} px},{x: ${currentMousePosition.y} px}, radius: ${dataClient} px`
+        );
         break;
       case 'draw_square':
         //добавить проверку на выход за пределы экрана
@@ -116,7 +143,9 @@ wsServer.on('connection', (ws) => {
           robot.dragMouse(currentMousePosition.x, y);
         }
         robot.mouseToggle('up');
-
+        console.log(
+          `Result: square at {x: ${currentMousePosition.x} px},{x: ${currentMousePosition.y} px}, width: ${dataClient} px, height: ${dataClient} px`
+        );
         break;
       case 'draw_rectangle':
         //добавить проверку на выход за пределы экрана
@@ -150,16 +179,22 @@ wsServer.on('connection', (ws) => {
           robot.dragMouse(currentMousePosition.x, y);
         }
         robot.mouseToggle('up');
-
+        console.log(
+          `Result: rectangular at {x: ${currentMousePosition.x} px},{x: ${currentMousePosition.y} px}, width: ${width} px, height: ${height} px`
+        );
+        break;
+      case 'prnt_scrn':
+        //добавить проверку на выход за пределы экрана
+        const buffer = await getPrintScreen(currentMousePosition);
+        ws.send(`prnt_scrn ${buffer}`);
+        console.log(
+          `Result: sent printscreen from {x: ${currentMousePosition.x} px},{x: ${currentMousePosition.y} px}, width: 200 px, height: 200 px`
+        );
         break;
     }
   });
-
-  //ws.send('something');
 });
 
 wsServer.on('close', () => {
   console.log('Bye!');
 });
-
-//robot.typeString('Hello World');

@@ -1,30 +1,40 @@
-# RSSchool NodeJS websocket task template
-> Static http server and base task packages.
+# NodeJS websocket
 
-## Installation
-1. Clone/download repo
-2. `npm install`
+Добрый день, проверяющий.
 
-## Usage
-**Development**
+Для запуска можно использовать команды:
+`npm run start:dev` - режим разработки
+`npm run start` - режим работы, production mode
 
-`npm run start:dev`
+Реализованы задачи:
 
-* App served @ `http://localhost:8181` with nodemon
+Start websocket server
+Handle websocket connection
+Move mouse (Up, Down, Left, Right)
+Draw circle, rectangle and square
+Send current mouse coordinates
+Send desktop capture (optionally)
+Typescript
+Using streams
+Modules
 
-**Production**
+Для управления необходимо:
 
-`npm run start`
-
-* App served @ `http://localhost:8181` without nodemon
-
----
-
-**All commands**
-
-Command | Description
---- | ---
-`npm run dev` | App served @ `http://localhost:8181` with nodemon
-`npm run start` | App served @ `http://localhost:8181` without nodemon
-
-**Note**: replace `npm` with `yarn` in `package.json` if you use yarn.
+1. Запустить приложение через команды, указанные выше
+2. Запустить файл index.js, находящийся в папке front
+3. Перейти в окно браузера с открытым фронтом (мышкой)
+4. Использовать команды навигации:
+   Стрелка вверх - в браузере указатель мыши перемещается вверх
+   Стрелка вниз - в браузере указатель мыши перемещается вниз
+   Стрелка влево - в браузере указатель мыши перемещается влево
+   Стрелка вправо - в браузере указатель мыши перемещается вправо
+   p (латинская) - в браузере, в окне 'Mouse control' отображаются координаты мышки
+5. Рисование:
+   5.1 Дополнительно открыть paint  
+   5.2 Вернуться в браузер
+   Использовать команды рисования:
+   c - в paint будет нарисован круг с радиусом, указанным в браузере, в поле "Figure width or radius (px)"
+   s - в paint будет нарисован квадрат со стороной, указанной в браузере, в поле "Figure width or radius (px)"
+   r - в paint будет нарисован прямоугольник с шириной, указанной в браузере, в поле "Figure width or radius (px)" и высотой из поля "Figure length (px)"
+6. Передача print screen
+   Использовать команду левый Ctrl+p
